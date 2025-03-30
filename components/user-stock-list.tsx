@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { collection, onSnapshot, doc, updateDoc, addDoc } from "firebase/firestore"
-import { db } from "../lib/firebase"
+import { Firestore } from "firebase/firestore"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -16,6 +16,8 @@ interface StockItem {
   type: string
   price: number
 }
+
+const db: Firestore = require("../lib/firebase").db;
 
 export function UserStockList() {
   const [stockItems, setStockItems] = useState<StockItem[]>([])
@@ -135,47 +137,73 @@ export function UserStockList() {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="all">All Items</TabsTrigger>
-          <TabsTrigger value="computer">Computers</TabsTrigger>
-          <TabsTrigger value="accessory">Accessories</TabsTrigger>
-          <TabsTrigger value="battery">Batteries</TabsTrigger>
+          {Array.from(new Set(stockItems.map((item) => item.type))).map((type) => (
+            <TabsTrigger key={type} value={type}>
+              {type}
+            </TabsTrigger>
+          ))}
         </TabsList>
         <TabsContent value={activeTab}>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Item Name</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Quantity</TableHead>
-                <TableHead>Price (ETB)</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredItems.map((item) => (
-                <TableRow key={item.id} className={item.quantity < 5 ? "bg-red-100" : ""}>
-                  <TableCell className="font-medium">
-                    {item.name}
-                    {item.quantity < 5 && <span className="ml-2 text-red-500 text-sm">(Low Stock)</span>}
-                  </TableCell>
-                  <TableCell>{item.type}</TableCell>
-                  <TableCell>{item.quantity}</TableCell>
-                  <TableCell>ETB {item.price.toFixed(2)}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <Input
-                        type="number"
-                        value={updateQuantity[item.id] || ""}
-                        onChange={(e) => setUpdateQuantity((prev) => ({ ...prev, [item.id]: e.target.value }))}
-                        placeholder="Quantity"
-                        className="w-24"
-                      />
-                      <Button onClick={() => handleSell(item.id)}>Sell</Button>
-                    </div>
-                  </TableCell>
+          <div className="hidden md:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Item Name</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Quantity</TableHead>
+                  <TableHead>Price (ETB)</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredItems.map((item) => (
+                  <TableRow key={item.id} className={item.quantity < 5 ? "bg-red-100" : ""}>
+                    <TableCell className="font-medium">
+                      {item.name}
+                      {item.quantity < 5 && <span className="ml-2 text-red-500 text-sm">(Low Stock)</span>}
+                    </TableCell>
+                    <TableCell>{item.type}</TableCell>
+                    <TableCell>{item.quantity}</TableCell>
+                    <TableCell>ETB {item.price.toFixed(2)}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <Input
+                          type="number"
+                          value={updateQuantity[item.id] || ""}
+                          onChange={(e) => setUpdateQuantity((prev) => ({ ...prev, [item.id]: e.target.value }))}
+                          placeholder="Quantity"
+                          className="w-24"
+                        />
+                        <Button onClick={() => handleSell(item.id)}>Sell</Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="grid grid-cols-1 md:hidden gap-4">
+            {filteredItems.map((item) => (
+              <div key={item.id} className="border p-4 rounded-lg shadow-md">
+                <h3 className="text-lg font-semibold">{item.name}
+                  {item.quantity < 5 && <span className="ml-2 text-red-500 text-sm">(Low Stock)</span>}
+                </h3>
+                <p>Type: {item.type}</p>
+                <p>Quantity: {item.quantity}</p>
+                <p>Price: ETB {item.price.toFixed(2)}</p>
+                <Input
+                  type="number"
+                  value={updateQuantity[item.id] || ""}
+                  onChange={(e) => setUpdateQuantity((prev) => ({ ...prev, [item.id]: e.target.value }))}
+                  placeholder="Quantity"
+                  className="w-full mt-2"
+                />
+                <div className="flex flex-col space-y-2 mt-4">
+                  <Button onClick={() => handleSell(item.id)} className="text-xs md:text-sm">Sell</Button>
+                </div>
+              </div>
+            ))}
+          </div>
         </TabsContent>
       </Tabs>
     </div>

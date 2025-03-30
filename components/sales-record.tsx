@@ -98,7 +98,7 @@ export function SalesRecord() {
       <CardHeader>
         <CardTitle className="flex justify-between items-center">
           <span>Sales Record</span>
-          <Button onClick={toggleVisibility} disabled={isLoading}>
+          <Button onClick={toggleVisibility} disabled={isLoading} className="text-xs md:text-sm">
             {isLoading ? "Loading..." : isVisible ? "Hide Sales Records" : "Show Sales Records"}
           </Button>
         </CardTitle>

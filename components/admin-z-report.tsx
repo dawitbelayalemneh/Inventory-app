@@ -204,12 +204,14 @@ export function AdminZReport() {
         <CardTitle className="flex justify-between items-center">
           <span>Z-Reports</span>
           <div>
-            <Button onClick={generateZReport} disabled={isLoading} className="mr-2">
-              {isLoading ? "Generating..." : "Generate Z-Report"}
-            </Button>
-            <Button onClick={toggleVisibility} disabled={isLoading}>
-              {isLoading ? "Loading..." : isVisible ? "Hide Z-Reports" : "Show Z-Reports"}
-            </Button>
+            <div className="flex flex-col space-y-2 md:flex-row md:space-x-4">
+              <Button onClick={generateZReport} disabled={isLoading} className="text-xs md:text-sm">
+                {isLoading ? "Generating..." : "Generate Z-Report"}
+              </Button>
+              <Button onClick={toggleVisibility} disabled={isLoading} className="text-xs md:text-sm">
+                {isLoading ? "Loading..." : isVisible ? "Hide Z-Reports" : "Show Z-Reports"}
+              </Button>
+            </div>
           </div>
         </CardTitle>
       </CardHeader>

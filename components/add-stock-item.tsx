@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from "react"
 import { addDoc, collection, query, where, getDocs, updateDoc, setDoc, doc } from "firebase/firestore"
-import { db } from "../lib/firebase"
+import { Firestore } from "firebase/firestore"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "@/components/ui/use-toast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+
+const db: Firestore = require("../lib/firebase").db;
 
 export function AddStockItem() {
   const [name, setName] = useState("")
@@ -19,6 +21,7 @@ export function AddStockItem() {
   const [isLoading, setIsLoading] = useState(false)
   const [itemTypes, setItemTypes] = useState<string[]>([])
   const [isOpen, setIsOpen] = useState(false)
+  const [notifyThreshold, setNotifyThreshold] = useState("")
 
   useEffect(() => {
     fetchItemTypes()
@@ -118,7 +121,7 @@ export function AddStockItem() {
       <DialogTrigger asChild>
         <Button>Add New Stock Item</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] overflow-y-auto max-h-[80vh]">
         <DialogHeader>
           <DialogTitle>Add New Stock Item</DialogTitle>
         </DialogHeader>
@@ -178,6 +181,17 @@ export function AddStockItem() {
               required
               min="0"
               step="0.01"
+            />
+          </div>
+          <div>
+            <Label htmlFor="notifyThreshold">Notify me when stock is below</Label>
+            <Input
+              id="notifyThreshold"
+              type="number"
+              value={notifyThreshold}
+              onChange={(e) => setNotifyThreshold(e.target.value)}
+              placeholder="Enter threshold"
+              min="0"
             />
           </div>
           <Button type="submit" disabled={isLoading}>
