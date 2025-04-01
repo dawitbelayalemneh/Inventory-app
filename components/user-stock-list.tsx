@@ -15,6 +15,7 @@ interface StockItem {
   quantity: number
   type: string
   price: number
+  notifyThreshold?: number
 }
 
 const db: Firestore = require("../lib/firebase").db;
@@ -124,6 +125,10 @@ export function UserStockList() {
   const filteredItems = stockItems
     .filter((item) => activeTab === "all" || item.type === activeTab)
     .filter((item) => item.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    .map((item) => ({
+      ...item,
+      isLowStock: item.quantity < (item.notifyThreshold || 5),
+    }));
 
   return (
     <div className="space-y-4">
@@ -157,10 +162,10 @@ export function UserStockList() {
               </TableHeader>
               <TableBody>
                 {filteredItems.map((item) => (
-                  <TableRow key={item.id} className={item.quantity < 5 ? "bg-red-100" : ""}>
+                  <TableRow key={item.id} className={item.isLowStock ? "bg-red-100" : ""}>
                     <TableCell className="font-medium">
                       {item.name}
-                      {item.quantity < 5 && <span className="ml-2 text-red-500 text-sm">(Low Stock)</span>}
+                      {item.isLowStock && <span className="ml-2 text-red-500 text-sm">(Low Stock)</span>}
                     </TableCell>
                     <TableCell>{item.type}</TableCell>
                     <TableCell>{item.quantity}</TableCell>
@@ -186,7 +191,7 @@ export function UserStockList() {
             {filteredItems.map((item) => (
               <div key={item.id} className="border p-4 rounded-lg shadow-md">
                 <h3 className="text-lg font-semibold">{item.name}
-                  {item.quantity < 5 && <span className="ml-2 text-red-500 text-sm">(Low Stock)</span>}
+                  {item.isLowStock && <span className="ml-2 text-red-500 text-sm">(Low Stock)</span>}
                 </h3>
                 <p>Type: {item.type}</p>
                 <p>Quantity: {item.quantity}</p>

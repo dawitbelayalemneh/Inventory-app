@@ -70,6 +70,7 @@ export function AddStockItem() {
             quantity: Number.parseInt(quantity, 10),
             type,
             price: Number.parseFloat(price),
+            notifyThreshold: Number.parseInt(notifyThreshold, 10) || 5,
           })
           toast({
             title: "Success",
@@ -82,6 +83,7 @@ export function AddStockItem() {
         setType("")
         setPrice("")
         setIsOpen(false)
+        setNotifyThreshold("")
       } catch (error) {
         console.error("Error adding/updating stock item: ", error)
         toast({
